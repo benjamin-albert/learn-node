@@ -14,9 +14,9 @@ module.exports = function(db) {
     eventsCollection.save( event, {w: 1}, function(err) {
       if (err) {
         res.status(500).end();
+      } else {
+        resp.json( { id: event._id } );
       }
-
-      resp.json( { id: event._id } );
     });
 
   };

@@ -5,6 +5,7 @@ var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
 var compression = require('compression');
 var saveFactory = require('./save');
+var getFactory = require('./get');
 var MongoClient = require('mongodb').MongoClient;
 
 console.log("Connecting to mongodb...");
@@ -30,12 +31,7 @@ MongoClient.connect('mongodb://benjamin:123456@ds037155.mongolab.com:37155/tryou
     res.sendFile(__dirname + '/index.html');
   });
 
-  app.get('/events', function(req, res) {
-    res.json([
-      {id: 1, foo: 'bar'},
-      {id: 2, baz: 'qux'},
-    ]);
-  });
+  app.get('/events', getFactory(db));
 
   // app.get('/hello', function(req, res) {
   //   res.sendFile(__dirname + '/hello.html');

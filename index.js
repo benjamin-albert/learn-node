@@ -1,3 +1,6 @@
+var start = new Date().getTime();
+console.log("Initializing dependencies...");
+
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -33,10 +36,6 @@ MongoClient.connect('mongodb://benjamin:123456@ds037155.mongolab.com:37155/tryou
 
   app.get('/events', getFactory(db));
 
-  // app.get('/hello', function(req, res) {
-  //   res.sendFile(__dirname + '/hello.html');
-  // });
-
   io.on('connection', function(socket) {
     console.log('a user connected');
 
@@ -60,7 +59,10 @@ MongoClient.connect('mongodb://benjamin:123456@ds037155.mongolab.com:37155/tryou
   });
 
   http.listen(3000, function() {
-    console.log('listening on *:3000');
+    console.log('listening on port :3000');
+    var end = new Date().getTime();
+    var time = end - start;
+    console.log('Initialization took ' + time + 'ms');
   });
 
 });

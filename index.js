@@ -3,14 +3,17 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
+var compression = require('compression');
 var save = require('./save');
 
+app.use(compression());
 app.use(bodyParser.json());
+
 app.use('/bower_components', express.static('./bower_components'));
 app.use('/static', express.static('./static'));
 app.use('/hello', express.static('./hello.html'));
 
-app.post('/events/:id', save);
+app.post('/events/', save);
 app.put('/events/:id', save);
 
 app.get('/', function(req, res) {

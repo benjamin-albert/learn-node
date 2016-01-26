@@ -4,55 +4,67 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
 var compression = require('compression');
-var save = require('./save');
+var saveFactory = require('./save');
+var MongoClient = require('mongodb').MongoClient;
 
-app.use(compression());
-app.use(bodyParser.json());
+console.log("Connecting to mongodb...");
 
-app.use('/bower_components', express.static('./bower_components'));
-app.use('/static', express.static('./static'));
-app.use('/hello', express.static('./hello.html'));
+MongoClient.connect('mongodb://benjamin:123456@ds037155.mongolab.com:37155/tryout', function(err, db) {
+  if (err) {
+    throw err;
+  }
 
-app.post('/events/', save);
-app.put('/events/:id', save);
+  app.use(compression());
+  app.use(bodyParser.json());
 
-app.get('/', function(req, res) {
-  res.sendFile(__dirname + '/index.html');
-});
+  app.use('/bower_components', express.static('./bower_components'));
+  app.use('/static', express.static('./static'));
+  app.use('/hello', express.static('./hello.html'));
 
-app.get('/events', function(req, res) {
-  res.json([
-    {id: 1, foo: 'bar'},
-    {id: 2, baz: 'qux'},
-  ]);
-});
+  var save = saveFactory(db);
 
-// app.get('/hello', function(req, res) {
-//   res.sendFile(__dirname + '/hello.html');
-// });
+  app.post('/events/', save);
+  app.put('/events/:id', save);
 
-io.on('connection', function(socket) {
-  console.log('a user connected');
-
-  socket.on('chat message', function(msg) {
-    console.log('User message: ' + msg);
-    io.emit('chat message', msg);
+  app.get('/', function(req, res) {
+    res.sendFile(__dirname + '/index.html');
   });
 
-  socket.on('disconnect', function() {
-    console.log('user disconnected');
+  app.get('/events', function(req, res) {
+    res.json([
+      {id: 1, foo: 'bar'},
+      {id: 2, baz: 'qux'},
+    ]);
   });
 
-  socket.on('typing', function() {
-    io.emit('typing');
+  // app.get('/hello', function(req, res) {
+  //   res.sendFile(__dirname + '/hello.html');
+  // });
+
+  io.on('connection', function(socket) {
+    console.log('a user connected');
+
+    socket.on('chat message', function(msg) {
+      console.log('User message: ' + msg);
+      io.emit('chat message', msg);
+    });
+
+    socket.on('disconnect', function() {
+      console.log('user disconnected');
+    });
+
+    socket.on('typing', function() {
+      io.emit('typing');
+    });
+
+    socket.on('stop typing', function() {
+      io.emit('stop typing');
+    });
+
   });
 
-  socket.on('stop typing', function() {
-    io.emit('stop typing');
+  http.listen(3000, function() {
+    console.log('listening on *:3000');
   });
 
-});
-
-http.listen(3000, function() {
-  console.log('listening on *:3000');
 });

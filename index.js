@@ -10,7 +10,7 @@ app.get('/', function(req, res) {
 io.on('connection', function(socket) {
   console.log('a user connected');
 
-  socket.on('chat message', function(msg){
+  socket.on('chat message', function(msg) {
     console.log('User message: ' + msg);
     io.emit('chat message', msg);
   });
@@ -18,6 +18,15 @@ io.on('connection', function(socket) {
   socket.on('disconnect', function() {
     console.log('user disconnected');
   });
+
+  socket.on('typing', function() {
+    io.emit('typing');
+  });
+
+  socket.on('stop typing', function() {
+    io.emit('stop typing');
+  });
+
 });
 
 http.listen(3000, function() {

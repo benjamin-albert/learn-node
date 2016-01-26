@@ -15,11 +15,24 @@
   </head>
   <body>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="//code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
 <script>
   var socket = io();
   $(function() {
     var $messageInput = $('#m');
+    var typing = false;
+
+    $messageInput.keyup(function() {
+      var message = $messageInput.val();
+      if (!typing && message) {
+        socket.emit('typing');
+        typing = true;
+      } else if (typing && !message) {
+        socket.emit('stop typing');
+        typing = false;
+      }
+    });
+
     $('form').submit(function(e){
       socket.emit('chat message', $messageInput.val());
       $messageInput.val('');
@@ -30,6 +43,18 @@
     var $messages = $('#messages');
     socket.on('chat message', function(msg) {
       $messages.append($('<li>').text(msg));
+      $(".typing").remove();
+      typing = false;
+    });
+
+    socket.on('typing', function() {
+      if (!typing) {
+        $messages.append(  $('<li class="typing">Typing...</li>') );
+      }
+    });
+
+    socket.on('stop typing', function() {
+      $(".typing").remove();
     });
   });
 </script>

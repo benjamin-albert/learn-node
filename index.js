@@ -8,7 +8,8 @@ var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
 var compression = require('compression');
 var saveFactory = require('./save');
-var getFactory = require('./get');
+var findEvent = require('./findEvent');
+var listEvents = require('./listEvents');
 var MongoClient = require('mongodb').MongoClient;
 
 console.log("Connecting to mongodb...");
@@ -35,8 +36,8 @@ MongoClient.connect('mongodb://benjamin:123456@ds037155.mongolab.com:37155/tryou
   });
 
 
-  app.get('/events/:id', getFactory(db));
-  app.get('/events', getFactory(db));
+  app.get('/events/:id', findEvent(db));
+  app.get('/events', listEvents(db));
 
   io.on('connection', function(socket) {
     console.log('a user connected');

@@ -34,6 +34,8 @@ MongoClient.connect('mongodb://benjamin:123456@ds037155.mongolab.com:37155/tryou
     res.sendFile(__dirname + '/index.html');
   });
 
+
+  app.get('/events/:id', getFactory(db));
   app.get('/events', getFactory(db));
 
   io.on('connection', function(socket) {
